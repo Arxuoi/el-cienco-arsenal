@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Cienco - Command Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="glitch" data-text="EL CIENCO ARSENAL">EL CIENCO ARSENAL</h1>
+            <div class="status-bar">
+                <span class="status-indicator" id="connectionStatus">● DISCONNECTED</span>
+                <span class="api-version">v2.3.1 // YEAR 2310</span>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Control Panel -->
+            <div class="panel control-panel">
+                <h2 class="panel-title">[ TARGET ACQUISITION ]</h2>
+                <div class="input-group">
+                    <label>Target IP/Host</label>
+                    <input type="text" id="targetInput" placeholder="192.168.1.1" value="127.0.0.1">
+                </div>
+                <div class="input-row">
+                    <div class="input-group half">
+                        <label>Port</label>
+                        <input type="number" id="portInput" placeholder="80" value="80">
+                    </div>
+                    <div class="input-group half">
+                        <label>Threads</label>
+                        <input type="number" id="threadsInput" placeholder="100" value="100" max="2048">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group half">
+                        <label>Duration (sec)</label>
+                        <input type="number" id="durationInput" placeholder="60" value="60">
+                    </div>
+                    <div class="input-group half">
+                        <label>API Port</label>
+                        <input type="number" id="apiPortInput" placeholder="6969" value="6969">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Attack Method</label>
+                    <select id="methodSelect">
+                        <option value="0">UDP Flood</option>
+                        <option value="1">TCP SYN Flood</option>
+                        <option value="2">HTTP Flood</option>
+                        <option value="3">Slowloris</option>
+                        <option value="4">DNS Amplification</option>
+                        <option value="5">ICMP Flood</option>
+                        <option value="6">RudyLoris</option>
+                        <option value="7" selected>Cloudflare Bypass</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-connect" id="connectBtn">CONNECT API</button>
+                    <button class="btn btn-attack" id="attackBtn" disabled>LAUNCH ATTACK</button>
+                    <button class="btn btn-stop" id="stopBtn" disabled>EMERGENCY STOP</button>
+                </div>
+            </div>
+
+            <!-- Stats Panel -->
+            <div class="panel stats-panel">
+                <h2 class="panel-title">[ TELEMETRY ]</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">SYSTEM STATUS</span>
+                        <span class="stat-value" id="systemStatus">IDLE</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">ACTIVE THREADS</span>
+                        <span class="stat-value" id="activeThreads">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">CURRENT TARGET</span>
+                        <span class="stat-value" id="currentTarget">---</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">PACKETS SENT</span>
+                        <span class="stat-value" id="packetsSent">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">BANDWIDTH</span>
+                        <span class="stat-value" id="bandwidth">0 Mbps</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">TIME ELAPSED</span>
+                        <span class="stat-value" id="timeElapsed">00:00</span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <label>ATTACK PROGRESS</label>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Console Panel -->
+            <div class="panel console-panel">
+                <h2 class="panel-title">[ SYSTEM CONSOLE ]</h2>
+                <div class="console-output" id="consoleOutput">
+                    <div class="console-line">> El Cienco System v2.3.1</div>
+                    <div class="console-line">> Year 2310 - No Cloud Infrastructure</div>
+                    <div class="console-line">> Protocol: No restrictions active</div>
+                    <div class="console-line">> Awaiting connection to API endpoint...</div>
+                    <div class="console-line">> ----------------------------------------</div>
+                </div>
+                <div class="console-input-container">
+                    <span class="prompt">></span>
+                    <input type="text" id="consoleInput" placeholder="Type command..." disabled>
+                </div>
+            </div>
+
+            <!-- Method Info Panel -->
+            <div class="panel method-panel">
+                <h2 class="panel-title">[ METHOD INFO ]</h2>
+                <div id="methodInfo">
+                    <h3 id="methodName">Cloudflare Bypass</h3>
+                    <p id="methodDescription">
+                        Advanced Layer 7 attack that mimics legitimate browser traffic.
+                        Uses rotating User-Agents, spoofed CF headers, and connection
+                        keep-alive to exhaust origin server resources behind Cloudflare.
+                    </p>
+                    <div class="method-stats">
+                        <span>Layer: <span id="methodLayer">L7</span></span>
+                        <span>Success Rate: <span id="methodSuccess">40%</span></span>
+                        <span>Stealth: <span id="methodStealth">HIGH</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span>EL CIENCO // EL MANCO COMMAND // NO EXTERNAL CONNECTION</span>
+            <span class="pulse"></span>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

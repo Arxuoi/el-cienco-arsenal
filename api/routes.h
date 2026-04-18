@@ -3,26 +3,42 @@
 
 #include "../include/api.h"
 
-// Route table
-static Route route_table[] = {
-    {"/attack",  HTTP_METHOD_POST,   handle_attack},
-    {"/stop",    HTTP_METHOD_POST,   handle_stop},
-    {"/status",  HTTP_METHOD_GET,    handle_status},
-    {"/methods", HTTP_METHOD_GET,    handle_methods},
-    {"/config",  HTTP_METHOD_GET,    handle_config},
-    {"/config",  HTTP_METHOD_POST,   handle_config},
-    {"",         HTTP_METHOD_UNKNOWN, NULL}  // Sentinel
-};
+// ============================================
+// ROUTE TABLE DECLARATION
+// ============================================
 
-// Find route handler
-static inline RouteHandler find_route(const char *path, HttpMethod method) {
-    for (int i = 0; route_table[i].handler != NULL; i++) {
-        if (strcmp(route_table[i].path, path) == 0 && 
-            route_table[i].method == method) {
-            return route_table[i].handler;
-        }
-    }
-    return handle_not_found;
-}
+// Global route table - defined in routes.c
+extern Route route_table[];
+
+// ============================================
+// ROUTE HANDLER FUNCTION DECLARATIONS
+// ============================================
+
+// Core attack handlers
+void handle_attack(ApiRequest *req, ApiResponse *res);
+void handle_stop(ApiRequest *req, ApiResponse *res);
+void handle_status(ApiRequest *req, ApiResponse *res);
+
+// Info handlers
+void handle_methods(ApiRequest *req, ApiResponse *res);
+void handle_config(ApiRequest *req, ApiResponse *res);
+
+// Fallback handler
+void handle_not_found(ApiRequest *req, ApiResponse *res);
+
+// ============================================
+// ROUTE UTILITIES
+// ============================================
+
+// Find route handler by path and method
+// Returns: Function pointer to handler, or handle_not_found if not found
+RouteHandler find_route(const char *path, HttpMethod method);
+
+// ============================================
+// ROUTE TABLE SIZE
+// ============================================
+
+// Number of routes in the table (excluding sentinel)
+#define ROUTE_COUNT (sizeof(route_table) / sizeof(Route) - 1)
 
 #endif // ROUTES_H

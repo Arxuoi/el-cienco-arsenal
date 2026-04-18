@@ -22,8 +22,7 @@ BUILD_DIR = build
 # Source files
 CORE_SOURCES = $(wildcard $(CORE_DIR)/*.c)
 UTILS_SOURCES = $(wildcard $(UTILS_DIR)/*.c)
-API_SOURCES = $(wildcard $(API_DIR)/*.c)
-
+API_SOURCES = $(filter-out $(API_DIR)/routes.c, $(wildcard $(API_DIR)/*.c))
 # Filter out problematic files
 UTILS_SOURCES := $(filter-out $(UTILS_DIR)/thread_pool.c, $(UTILS_SOURCES))
 
